@@ -41,15 +41,21 @@ class Animeflv:
         
         for anime in animes:
             lines = []
-            description = anime.find(class_='Description').find_all('p')[-1].contents[0]
-            splitted = "\n".join(textwrap.wrap(description, width=first_line_width)).split("\n")
-            first_line = splitted[0]
-            description = "\n".join(splitted[1:])
-            lines.append(first_line)
-            
+            description = ""
+            splitted = ""
+            first_line = ""
+            try:
+                description = anime.find(class_='Description').find_all('p')[-1].contents[0]
+                splitted = "\n".join(textwrap.wrap(description, width=first_line_width)).split("\n")
+                first_line = splitted[0]
+                description = "\n".join(splitted[1:])
+                lines.append(first_line)
+            except:
+                pass
+
             anime_dict[anime.find(class_='Title').contents[0]] = {
                 "Type": anime.find(class_='Type').contents[0],
-                "Description": "\n".join(lines + textwrap.wrap(description, width=wrap_width)),
+                "Description": "\n".join(lines + textwrap.wrap(description, width=wrap_width)) if description else "",
                 "Rating": anime.find(class_='Description').find(class_='Vts').contents[0],
                 "Followers": anime.find(class_='Description').find(class_='Flwrs').find('span').contents[0],
                 "URL": anime.find(class_='Vrnmlk')["href"]
