@@ -1,4 +1,4 @@
-from animeflv import Animeflv
+from animeflv import *
 import curses
 import sys
 animeflv = Animeflv()
@@ -59,16 +59,20 @@ def get_anime(screen, *args):
     return [selected_anime != None, data, selected_anime]
 
 def get_anime_chapters(screen, *args):
-    animes = args[0]
+    animes = dict(args[0])
     selected_anime = args[1]
-
+    og_url = animes[selected_anime]["URL"]
+    animes[selected_anime]["URL"] = BASE_URL + animes[selected_anime]["URL"]
     q = None; x=0; y=0
     
     while q != 10:
         screen.clear()
         screen.addstr(f"{'=' * (len(selected_anime)+4)}\n| {selected_anime} |\n{'=' * (len(selected_anime)+4)}\n\n", curses.color_pair(1))
         for key, value in animes[selected_anime].items():
-            title_str = f"{key}: {value}\n"
+
+            key = f"[{key}]"
+            screen.addstr(key, curses.color_pair(2))
+            title_str = f": {value}\n"
             screen.addstr(title_str)
             
         screen.addstr(f"\n {'>' * (y == 0)} [Ver Capitulos]\n", curses.color_pair(0 if y == 1 else 2))
@@ -82,9 +86,8 @@ def get_anime_chapters(screen, *args):
         
         if y < 0: y = 1
         if y > 1: y = 0
-        
-    url = animes[selected_anime]["URL"]
-    chapters = animeflv.get_chapters(url)
+    animes[selected_anime]["URL"] = og_url
+    chapters = animeflv.get_chapters(og_url)
     return [y==0, chapters, selected_anime] 
 
 def get_anime_servers(screen, *args):
@@ -181,6 +184,7 @@ def main():
     #print(url)
     #print(chapters)
     #print(servers)
+    curses.endwin()
 
 def n_main():
     anime = input("Anime? (default Overlord): ") or "Overlord"
@@ -211,8 +215,5 @@ if __name__ == "__main__":
     else:
         try:
             main()
-        except Exception as e:
-            curses.endwin()
-            print(e)
         except KeyboardInterrupt:
             curses.endwin()
