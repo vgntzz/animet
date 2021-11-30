@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 from animeflv import *
 import curses
 import sys
