@@ -95,14 +95,20 @@ def get_anime_servers(screen, *args):
 
     chapters = args[0]
     selected_anime = args[1]
-    q = None; x=0; y=0
+    yex = screen.getmaxyx()
+    cuanto_mostrar = 20 if (len(chapters) > 20) else len(chapters) + 1
+    current_shift = len(chapters) - cuanto_mostrar//2 if len(chapters) >= cuanto_mostrar else 0
+    scroll_amount = cuanto_mostrar>>1
+    
+    q = None; x=0; y=len(chapters) - 1
     while 1:
         screen.clear()
 
         screen.addstr(f"{'=' * (len(selected_anime)+4)}\n| {selected_anime} |\n{'=' * (len(selected_anime)+4)}\n\n", curses.color_pair(1))
-        for i in range(len(chapters)):
-            screen.addstr(f"{'> ' * int(y == i)}[+] Capitulo {i+1}\n", curses.color_pair(0 if y != i else 1))
 
+        for i in range(current_shift, current_shift + cuanto_mostrar):
+            if(i >= len(chapters)): break
+            screen.addstr(f"{'> ' * int(y == i)}[+] Capitulo {i+1}\n", curses.color_pair(0 if y != i else 1))
         screen.addstr('\n')
         screen.addstr(f"{'> ' * int(y == len(chapters))} [Volver]", curses.color_pair(0 if y != len(chapters) else 2))
         
@@ -111,11 +117,19 @@ def get_anime_servers(screen, *args):
         
         if q == 27: return -23
         if q in KEYS["UP"]: y -= 1
-        elif q in KEYS["DOWN"]: y += 1
+        elif q in KEYS["DOWN"]:y += 1
+         
+        if(y >= cuanto_mostrar + current_shift): current_shift += scroll_amount 
+        if(y < current_shift): current_shift -= scroll_amount 
+        if(current_shift < 0): current_shift = 0
         
-        if y < 0: y = len(chapters)
-        if y > len(chapters): y = 0
-
+        if y < 0:
+            y = len(chapters)
+            current_shift = y-cuanto_mostrar + 1
+        if y > len(chapters): 
+            y = 0
+            current_shift = 0
+        
         if q == 10:
             if(y >= len(chapters)):
                 print("VOLVIENDO")
