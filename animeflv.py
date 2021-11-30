@@ -1,5 +1,6 @@
 import cloudscraper
 import re, json
+import textwrap
 from bs4 import BeautifulSoup
 import subprocess as sp
 
@@ -33,10 +34,22 @@ class Animeflv:
     def parse_anime_list(self, table):
         animes = table.find_all('li')
         anime_dict = {}
+
+        wrap_width = 75
+        first_line_width = wrap_width - len("Description: ")
+
+        
         for anime in animes:
+            lines = []
+            description = anime.find(class_='Description').find_all('p')[-1].contents[0]
+            splitted = "\n".join(textwrap.wrap(description, width=first_line_width)).split("\n")
+            first_line = splitted[0]
+            description = "\n".join(splitted[1:])
+            lines.append(first_line)
+            
             anime_dict[anime.find(class_='Title').contents[0]] = {
                 "Type": anime.find(class_='Type').contents[0],
-                "Description": anime.find(class_='Description').find_all('p')[-1].contents[0],
+                "Description": "\n".join(lines + textwrap.wrap(description, width=wrap_width)),
                 "Rating": anime.find(class_='Description').find(class_='Vts').contents[0],
                 "Followers": anime.find(class_='Description').find(class_='Flwrs').find('span').contents[0],
                 "URL": anime.find(class_='Vrnmlk')["href"]
