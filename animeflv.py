@@ -124,11 +124,12 @@ class Animeflv:
         print(r.text)
 
     def stream_from_zippy(self, received_url):
-        zippy_base_url = received_url.split('.com')[0] + ".com"    
+        zippy_base_url = received_url.split('.com')[0] + ".com"
+        res_url = ""
         r = self.scraper.get(received_url)
         soup = BeautifulSoup(r.text, 'lxml')
         scripts = soup.find_all('script')
-        res_url = ""
+
         for script in scripts:
             desired = str(script)
             if "document.getElementById('dlbutton')" in desired:
@@ -136,9 +137,18 @@ class Animeflv:
 
                 res_split = resource.split(" + ")
                 res_split =[res_split[0], res_split[1] + " + " + res_split[2],  res_split[3]]
-        
-                for piece in res_split:
-                    res_url += str(eval(piece))
+
+                import ast
+                tree = ast.parse(res_split[1][1:-1], mode='eval')
+                whitelist = (ast.Expression, ast.Call, ast.Name, ast.Load,
+                             ast.BinOp, ast.UnaryOp, ast.operator, ast.unaryop, ast.cmpop,
+                             ast.Num,
+                             )
+                valid = all(isinstance(node, whitelist) for node in ast.walk(tree))
+                if valid:
+                    result = eval(compile(tree, filename='', mode='eval'),
+                                  {"__builtins__": None}, None)
+                    res_url = res_split[0][1:-1] + str(result) + res_split[2][1:-1]
                 break
 
 
@@ -168,4 +178,5 @@ class Animeflv:
 
             
 #animeflv = Animeflv()
+#animeflv.stream_from_zippy("https://www100.zippyshare.com/v/9hv1eSkj/file.html")
 #animeflv.stream_from_streamtape("https://strtpe.link/v/yAgpJxZW1BCdje/")
