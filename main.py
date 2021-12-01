@@ -144,8 +144,19 @@ def get_anime_servers(screen, *args):
 
 def stream(screen, *args):
     servers = args[0]
-    zippy_url = servers[1]
-    animeflv.stream_from_zippy(zippy_url)
+    for server in servers:
+        if 'zippy' in server:
+            url = animeflv.stream_from_zippy(server)
+            if url:
+                animeflv.stream(url)
+                break
+        if 'streamtape' in server:
+            url = animeflv.stream_from_streamtape(server)
+            if url:
+                animeflv.stream(url)
+                break
+    #zippy_url = servers[1]
+    #animeflv.stream_from_zippy(zippy_url)
     return [True, None, None]
     
 
@@ -223,9 +234,18 @@ def n_main():
 
         cap = int(input("Capitulo (default 1): ") or "0") - 1
         servers = animeflv.get_servers(result[cap])
-        #print(servers)
-        zippy_url = servers[1]
-        animeflv.stream_from_zippy(zippy_url)
+        for server in servers:
+            if 'zippy' in server:
+                url = animeflv.stream_from_zippy(server)
+                if url:
+                    animeflv.stream(url)
+                    break
+            if 'streamtape' in server:
+                url = animeflv.stream_from_streamtape(server)
+                if url:
+                    animeflv.stream(url)
+                    break
+
     
 if __name__ == "__main__":
     if len(sys.argv) > 1: n_main()

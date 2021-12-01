@@ -141,6 +141,31 @@ class Animeflv:
                     res_url += str(eval(piece))
                 break
 
-        if res_url:
-            d = sp.Popen(['mpv', zippy_base_url + res_url]).communicate()
+
+        return zippy_base_url + res_url
+        # if res_url:
+        #     d = sp.Popen(['mpv', zippy_base_url + res_url]).communicate()
+
+    def stream_from_streamtape(self, received_url):
+        r = self.scraper.get(received_url)
+        rb = self.scraper.head(received_url)
+        soup = BeautifulSoup(r.text, 'lxml')
+        url = ""
+        scripts = soup.find_all('script')
+        for script in scripts:
+            desired = str(script)
+            if "document.getElementById('norobotlink')" in desired:
+                result =desired.split("document.getElementById('norobotlink').innerHTML = ")[-1].split(';')[0]
+                splitted =result.split(' + ')
+                url = "https:" + splitted[0][1:-1] + splitted[1].split('.subs')[0][5:-2]
+                #print(url)
+                break
         
+        return url            
+        
+    def stream(self, url):
+        d = sp.Popen(['mpv', url]).communicate()        
+
+            
+#animeflv = Animeflv()
+#animeflv.stream_from_streamtape("https://strtpe.link/v/yAgpJxZW1BCdje/")
