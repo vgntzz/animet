@@ -9,6 +9,8 @@ BROWSE_URL = BASE_URL + "/browse"
 WATCH_URL = BASE_URL + "/ver"
 QUERY_PARAM = "?q="
 
+DEFAULT_PLAYER = 'mpv'
+
 class Animeflv:
     
     def __init__(self):
@@ -139,16 +141,13 @@ class Animeflv:
                 res_split =[res_split[0], res_split[1] + " + " + res_split[2],  res_split[3]]
 
                 import ast
-                tree = ast.parse(res_split[1][1:-1], mode='eval')
-                whitelist = (ast.Expression, ast.Call, ast.Name, ast.Load,
-                             ast.BinOp, ast.UnaryOp, ast.operator, ast.unaryop, ast.cmpop,
+                try: tree = ast.parse(res_split[1][1:-1], mode='eval')
+                except: break
+                whitelist = (ast.Expression,
+                             ast.BinOp, ast.UnaryOp, ast.operator, ast.unaryop,
                              ast.Num,
                              )
-                valid = all(isinstance(node, whitelist) for node in ast.walk(tree))
-                if valid:
-                    result = eval(compile(tree, filename='', mode='eval'),
-                                  {"__builtins__": None}, None)
-                    res_url = res_split[0][1:-1] + str(result) + res_split[2][1:-1]
+                if all(isinstance(node, whitelist) for node in ast.walk(tree)): res_url = res_split[0][1:-1] + str(eval(compile(tree, filename='', mode='eval'), {"__builtins__": None}, None)) + res_split[2][1:-1]
                 break
 
 
@@ -174,9 +173,9 @@ class Animeflv:
         return url            
         
     def stream(self, url):
-        d = sp.Popen(['mpv', url]).communicate()        
+        d = sp.Popen([DEFAULT_PLAYER, url]).communicate()        
 
             
 #animeflv = Animeflv()
-#animeflv.stream_from_zippy("https://www100.zippyshare.com/v/9hv1eSkj/file.html")
+#print(animeflv.stream_from_zippy("https://www100.zippyshare.com/v/9hv1eSkj/file.html"))
 #animeflv.stream_from_streamtape("https://strtpe.link/v/yAgpJxZW1BCdje/")
