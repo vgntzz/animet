@@ -1,4 +1,5 @@
-# animet
+# TAnime >.<
+![Alt text](images/tanime.jpg?raw=true "TAnime")
 ? -XD!!
 ```
 git clone git@github.com:vgntzz/animet
