@@ -4,7 +4,7 @@ import curses
 import sys
 animeflv = Animeflv()
 
-KEYS = {"UP": [ord('w'), curses.KEY_UP], "DOWN": [ord('s'), curses.KEY_DOWN], "LEFT": [ord('a'), curses.KEY_LEFT], "RIGHT": [ord('d'), curses.KEY_RIGHT]}
+KEYS = {"UP": [ord('w'), ord('k'), curses.KEY_UP], "DOWN": [ord('s'), ord('j'), curses.KEY_DOWN], "LEFT": [ord('a'), ord('h'), curses.KEY_LEFT], "RIGHT": [ord('d'), ord('l'), curses.KEY_RIGHT], "BACK": [ord('z')]}
 
 def my_raw_input(stdscr, r, c, prompt_string):
     stdscr.addstr(r, c, prompt_string)
@@ -50,7 +50,7 @@ def get_anime(screen, *args):
         elif q in KEYS["DOWN"]: y += 1
         if y >= len(data.keys()) + 1: y = 0
         if y < 0: y = len(data.keys())
-
+        if(q in KEYS["BACK"]): return [False, None, None]
     selected_anime = None
     for i, key in enumerate(data.keys()):
         if i == y:
@@ -84,6 +84,7 @@ def get_anime_chapters(screen, *args):
         if q == 27: return -23
         if q in KEYS["UP"]: y -= 1
         elif q in KEYS["DOWN"]: y += 1
+        if(q in KEYS["BACK"]): return [False, None, None]
         
         if y < 0: y = 1
         if y > 1: y = 0
@@ -122,6 +123,7 @@ def get_anime_servers(screen, *args):
         if(y >= cuanto_mostrar + current_shift): current_shift += scroll_amount 
         if(y < current_shift): current_shift -= scroll_amount 
         if(current_shift < 0): current_shift = 0
+        if(q in KEYS["BACK"]): return [False, None, None]
         
         if y < 0:
             y = len(chapters)
