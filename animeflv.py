@@ -97,13 +97,23 @@ class Animeflv:
         r = self.scraper.get(WATCH_URL + cid)
         body = r.text
         bs = BeautifulSoup(body, 'lxml')
-        servers_data_json = {}
+        servers_data_json = {"SUB": [], "LAT": []}
         servers_data = []
         #print(bs.prettify())
-        buttons = bs.find_all('a', class_="Button Sm fa-download")
-        for button in buttons:
-            servers_data.append(button["href"])
-        return servers_data
+        trs = bs.find_all('tr')[1:]
+        for tr in trs:
+            for td in tr.find_all('td'):
+                if 'LAT' in str(td):
+                    servers_data_json['LAT'].append(tr.find('a', class_="Button Sm fa-download")["href"])
+                elif 'SUB' in str(td):
+                    servers_data_json['SUB'].append(tr.find('a', class_="Button Sm fa-download")["href"])
+
+        return servers_data_json
+        # print(servers_data_json)
+        # buttons = bs.find_all('a', class_="Button Sm fa-download")
+        # for button in buttons:
+        #     servers_data.append(button["href"])
+        # return servers_data
         # scripts = bs.find_all('script')
         # servers_data = {}
         # for script in scripts:
@@ -179,3 +189,7 @@ class Animeflv:
 #animeflv = Animeflv()
 #print(animeflv.stream_from_zippy("https://www100.zippyshare.com/v/9hv1eSkj/file.html"))
 #animeflv.stream_from_streamtape("https://strtpe.link/v/yAgpJxZW1BCdje/")
+#print(animeflv.search('re zero')["Re:Zero kara Hajimeru Isekai Seikatsu"]["URL"])
+#print(animeflv.get_chapters('/anime/rezero-kara-hajimeru-isekai-seikatsu'))
+#x = animeflv.get_servers("/41916/rezero-kara-hajimeru-isekai-seikatsu-16")
+#print(x)

@@ -148,19 +148,31 @@ def get_anime_servers(screen, *args):
 
 def stream(screen, *args):
     servers = args[0]
-    for server in servers:
-        if 'zippy' in server:
-            url = animeflv.stream_from_zippy(server)
-            if url:
-                animeflv.stream(url)
-                break
-        if 'streamtape' in server:
-            url = animeflv.stream_from_streamtape(server)
-            if url:
-                animeflv.stream(url)
-                break
-    #zippy_url = servers[1]
-    #animeflv.stream_from_zippy(zippy_url)
+    preferred_mode = 'SUB'
+    if preferred_mode in servers.keys():
+        for server in servers[preferred_mode]:
+            if 'zippy' in server:
+                url = animeflv.stream_from_zippy(server)
+                if url:
+                    animeflv.stream(url)
+                    break
+            if 'streamtape' in server:
+                url = animeflv.stream_from_streamtape(server)
+                if url:
+                    animeflv.stream(url)
+                    break
+    elif 'LAT' in servers.keys():
+        for server in servers['LAT']:
+            if 'zippy' in server:
+                url = animeflv.stream_from_zippy(server)
+                if url:
+                    animeflv.stream(url)
+                    break
+            if 'streamtape' in server:
+                url = animeflv.stream_from_streamtape(server)
+                if url:
+                    animeflv.stream(url)
+                    break
     return [True, None, None]
     
 
@@ -238,17 +250,32 @@ def n_main():
 
         cap = int(input("Capitulo (default 1): ") or "0") - 1
         servers = animeflv.get_servers(result[cap])
-        for server in servers:
-            if 'zippy' in server:
-                url = animeflv.stream_from_zippy(server)
-                if url:
-                    animeflv.stream(url)
-                    break
-            if 'streamtape' in server:
-                url = animeflv.stream_from_streamtape(server)
-                if url:
-                    animeflv.stream(url)
-                    break
+
+        preferred_mode = 'SUB'
+        if preferred_mode in servers.keys():
+            for server in servers[preferred_mode]:
+                if 'zippy' in server:
+                    url = animeflv.stream_from_zippy(server)
+                    if url:
+                        animeflv.stream(url)
+                        break
+                if 'streamtape' in server:
+                    url = animeflv.stream_from_streamtape(server)
+                    if url:
+                        animeflv.stream(url)
+                        break
+        elif 'LAT' in servers.keys():
+            for server in servers['LAT']:
+                if 'zippy' in server:
+                    url = animeflv.stream_from_zippy(server)
+                    if url:
+                        animeflv.stream(url)
+                        break
+                if 'streamtape' in server:
+                    url = animeflv.stream_from_streamtape(server)
+                    if url:
+                        animeflv.stream(url)
+                        break
 
     
 if __name__ == "__main__":
